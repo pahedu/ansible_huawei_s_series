@@ -1,16 +1,16 @@
 #!/bin/bash
-if [ -z `which pip` ]  ; then
+if [ -z `which pip3` ]  ; then
    echo "Error: python-pip not install."
    exit 1 
 fi
 
-pip install --upgrade pip
+pip3 install --upgrade pip
 if [ `ansible --version | head -1 | cut -f2 -d' '|cut -c1-3` != "2.9" ]; then
    echo "Error: The script only supports ansible 2.9."
    exit 1
 fi
 
-ANSIBLE_LOCATION=`pip show ansible | grep Location | cut -f2 -d':'`
+ANSIBLE_LOCATION=`pip3 show ansible | grep Location | cut -f2 -d':'`
 ANSIBLE_PATH="$ANSIBLE_LOCATION/ansible"
 
 if [ -z "$ANSIBLE_LOCATION" ] ; then
