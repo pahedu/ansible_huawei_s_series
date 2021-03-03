@@ -1,0 +1,102 @@
+DOCUMENTATION = """
+---
+module: huawei_s_static_route
+version_added: "2.9"
+author: "Aleksandr Natov (@pahedu)"
+short_description: Manage static IP routes on Huawei S Series network devices
+description:
+  - This module provides declarative management of static
+    IP routes on Huawei S Series network devices.
+notes:
+  - Tested against VRP V200R010C00SPC600
+options:
+  prefix:
+    description:
+      - Network prefix of the static route.
+  mask:
+    description:
+      - Network prefix mask of the static route.
+  next_hop:
+    description:
+      - Next hop IP of the static route.
+  vrf:
+    description:
+      - VRF of the static route.
+  interface:
+    description:
+      - Interface of the static route.
+  name:
+    description:
+      - Name of the static route
+    aliases: ['description']
+  admin_distance:
+    description:
+      - Admin distance of the static route.
+  tag:
+    description:
+      - Set tag of the static route.
+  track:
+    description:
+      - Tracked item to depend on for the static route.
+  aggregate:
+    description: List of static route definitions.
+  state:
+    description:
+      - State of the static route configuration.
+    default: present
+    choices: ['present', 'absent']
+extends_documentation_fragment: huawei_s
+"""
+
+EXAMPLES = """
+- name: configure static route
+  huawei_s_static_route:
+    prefix: 192.168.2.0
+    mask: 255.255.255.0
+    next_hop: 10.0.0.1
+
+- name: configure black hole in vrf blue depending on nqa item test
+  huawei_s_static_route:
+    prefix: 192.168.2.0
+    mask: 255.255.255.0
+    vrf: blue
+    interface: null0
+    track: test test 
+
+- name: configure ultimate route with name and tag
+  huawei_s_static_route:
+    prefix: 192.168.2.0
+    mask: 255.255.255.0
+    interface: Vlanif1
+    name: route_description
+    tag: 100
+
+- name: remove configuration
+  huawei_s_static_route:
+    prefix: 192.168.2.0
+    mask: 255.255.255.0
+    next_hop: 10.0.0.1
+    state: absent
+
+- name: Add static route aggregates
+  huwei_s_static_route:
+    aggregate:
+      - { prefix: 172.16.32.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+      - { prefix: 172.16.33.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+
+- name: Remove static route aggregates
+  huawei_s_static_route:
+    aggregate:
+      - { prefix: 172.16.32.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+      - { prefix: 172.16.33.0, mask: 255.255.255.0, next_hop: 10.0.0.8 }
+    state: absent
+"""
+
+RETURN = """
+commands:
+  description: The list of configuration mode commands to send to the device
+  returned: always
+  type: list
+  sample:
+    - ip route-static 192.168.2.0 255.255.255.0 10.0.0.1
+"""

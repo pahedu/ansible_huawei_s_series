@@ -1,0 +1,209 @@
+DOCUMENTATION = """
+---
+module: huawei_s_lldp_interfaces
+version_added: 2.9
+short_description: Manage link layer discovery protocol (LLDP) attributes of interfaces on Huawei S Series devices.
+description: This module manages link layer discovery protocol (LLDP) attributes of interfaces on Huawei S Series devices.
+author: Aleksandr Natov (@pahedu)
+notes:
+  - Tested against VRP V200R010C00SPC600
+  - This module works with connection C(network_cli),
+options:
+  config:
+    description: A dictionary of LLDP options
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - Full name of the interface excluding any logical unit number, i.e. GigabitEthernet0/0/1.
+        type: str
+        required: True
+      enabled:
+        description:
+          - Enable LLDP on interface.
+        type: bool
+  state:
+    description:
+    - The state of the configuration after module completion
+    type: str
+    choices:
+    - merged
+    - replaced
+    - overridden
+    - deleted
+    default: merged
+"""
+
+EXAMPLES = """
+
+# Using merged
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/4:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/5:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+- name: Merge provided configuration with device configuration
+  huawei_s_lldp_interfaces:
+    config:
+      - name: GigabitEthernet0/0/3
+        enabled: True
+      - name: GigabitEthernet0/0/4
+        enabled: True
+      - name: GigabitEthernet0/0/5
+        enabled: True
+    state: merged
+
+# After state:
+# ------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/3:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/4:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/5:
+#LLDP Enable Status       :enabled             (default is disabled)
+
+# Using overridden
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/3:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/4:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/5:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+- name: Override device configuration of all lldp_interfaces with provided configuration
+  huawei_s_lldp_interfaces:
+    config:
+      - name: GigabitEthernet0/0/2
+        enabled: True
+    state: overridden
+
+# After state:
+# ------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+
+
+# Using replaced
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+- name: Replaces device configuration of listed lldp_interfaces with provided configuration
+  huawei_s_lldp_interfaces:
+    config:
+      - name: GigabitEthernet0/0/2
+        enabled: True
+      - name: GigabitEthernet0/0/3
+        enabled: True
+    state: replaced
+
+# After state:
+# ------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+# Using Deleted
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/2:
+#LLDP Enable Status       :enabled             (default is disabled)
+#Interface GigabitEthernet0/0/3:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+#
+
+- name: "Delete LLDP attributes of given interfaces (Note: This won't delete the interface itself)"
+  huawei_s_lldp_interfaces:
+    config:
+      - name: GigabitEthernet0/0/2
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/3:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+# Using Deleted without any config passed
+# "(NOTE: This will delete all of configured LLDP module attributes)"
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display lldp local
+#Interface GigabitEthernet0/0/3:
+#LLDP Enable Status       :enabled             (default is disabled)
+#
+
+- name: "Delete LLDP attributes for all configured interfaces (Note: This won't delete the interface itself)"
+  huawei_s_lldp_interfaces:
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display lldp local
+
+#
+
+"""
+
+RETURN = """
+before:
+  description: The configuration as structured data prior to module invocation.
+  returned: always
+  type: list
+  sample: >
+    The configuration returned will always be in the same format
+     of the parameters above.
+after:
+  description: The configuration as structured data after module completion.
+  returned: when changed
+  type: list
+  sample: >
+    The configuration returned will always be in the same format
+     of the parameters above.
+commands:
+  description: The set of commands pushed to the remote device.
+  returned: always
+  type: list
+  sample: ['interface GigabitEthernet 0/0/1', 'lldp enable']
+"""

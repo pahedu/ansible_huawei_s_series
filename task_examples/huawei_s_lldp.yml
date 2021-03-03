@@ -1,0 +1,39 @@
+DOCUMENTATION = """
+---
+module: huawei_s_lldp
+version_added: "2.9"
+author: "Aleksandr Natov (@pahedu)"
+short_description: Manage LLDP configuration on Huawei S Series network devices.
+description:
+  - This module provides declarative management of LLDP service
+    on Huawei S Series network devices.
+notes:
+  - Tested against  VRP V200R010C00SPC600
+options:
+  state:
+    description:
+      - State of the LLDP configuration. If value is I(present) lldp will be enabled
+        else if it is I(absent) it will be disabled.
+    default: present
+    choices: ['present', 'absent']
+extends_documentation_fragment: huawei_s
+"""
+
+EXAMPLES = """
+- name: Enable LLDP service
+  huawei_s_lldp:
+    state: present
+
+- name: Disable LLDP service
+  huawei_s_lldp:
+    state: absent
+"""
+
+RETURN = """
+commands:
+  description: The list of configuration mode commands to send to the device
+  returned: always, except for the platforms that use Netconf transport to manage the device.
+  type: list
+  sample:
+    - lldp enable
+"""

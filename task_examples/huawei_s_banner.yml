@@ -1,0 +1,66 @@
+DOCUMENTATION = """
+---
+module: huawei_s_banner
+version_added: "2.9"
+author: "Aleksandr Natov (@pahedu)"
+short_description: Manage multiline banners on Huawei S Series devices
+description:
+  - This will configure both login and motd banners on remote devices
+    running Huawei VRP.  It allows playbooks to add or remote
+    banner text from the active running configuration.
+extends_documentation_fragment: huawei_s
+notes:
+  - Tested against VRP V200R010C00SPC600
+options:
+  banner:
+    description:
+      - Specifies which banner should be configured on the remote device.
+    required: true
+    choices: ['login', 'shell']
+  text:
+    description:
+      - The banner text that should be
+        present in the remote device running configuration.  This argument
+        accepts a multiline string, with no empty lines. Requires I(state=present).
+  state:
+    description:
+      - Specifies whether or not the configuration is
+        present in the current devices active running configuration.
+    default: present
+    choices: ['present', 'absent']
+"""
+
+EXAMPLES = """
+- name: configure the login banner
+  huwei_s_banner:
+    banner: login
+    text: |
+      this is my login banner
+      that contains a multiline
+      string
+    state: present
+
+- name: remove the motd banner
+  huawei_s_banner:
+    banner: shell
+    state: absent
+
+- name: Configure banner from file
+  huawei_s_banner:
+    banner:  shell
+    text: "{{ lookup('file', './config_partial/raw_banner.cfg') }}"
+    state: present
+
+"""
+
+RETURN = """
+commands:
+  description: The list of configuration mode commands to send to the device
+  returned: always
+  type: list
+  sample:
+    - banner login
+    - this is my login banner
+    - that contains a multiline
+    - string
+"""

@@ -1,0 +1,128 @@
+DOCUMENTATION = """
+---
+module: huawei_s_lacp
+version_added: 2.9
+short_description: Manage Global Link Aggregation Control Protocol (LACP) on Huawei S Series devices.
+description: This module provides declarative management of Global LACP on Huawei S Series network devices.
+author: Aleksandr Natov (@pahedu)
+notes:
+  - Tested against VRP V200R010C00SPC600
+  - This module works with connection C(network_cli),
+options:
+  config:
+    description: The provided configurations.
+    type: dict
+    suboptions:
+      system:
+        description: This option sets the default system parameters for LACP.
+        type: dict
+        suboptions:
+          priority:
+            description:
+            - LACP priority for the system.
+            - Refer to vendor documentation for valid values.
+            type: int
+            required: True
+  state:
+    description:
+    - The state of the configuration after module completion
+    type: str
+    choices:
+    - merged
+    - replaced
+    - deleted
+    default: merged
+"""
+
+EXAMPLES = """
+
+# Using merged
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 32768
+#System ID      : a08c-f8f6-7900
+
+
+- name: Merge provided configuration with device configuration
+  huawei_s_lacp:
+    config:
+      system:
+        priority: 123
+    state: merged
+
+# After state:
+# ------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 123
+#System ID      : a08c-f8f6-7900
+
+# Using replaced
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 123
+#System ID      : a08c-f8f6-7900
+
+- name: Replaces Global LACP configuration
+  huawei_s_lacp:
+    config:
+      system:
+        priority: 500
+    state: replaced
+
+# After state:
+# ------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 500
+#System ID      : a08c-f8f6-7900
+
+# Using Deleted
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 500
+#System ID      : a08c-f8f6-7900
+
+- name: Delete Global LACP attribute
+  huawei_s_lacp:
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]disp lacp brief
+#System Priority: 32768
+#System ID      : a08c-f8f6-7900
+
+"""
+
+RETURN = """
+before:
+  description: The configuration as structured data prior to module invocation.
+  returned: always
+  type: list
+  sample: >
+    The configuration returned will always be in the same format
+     of the parameters above.
+after:
+  description: The configuration as structured data after module completion.
+  returned: when changed
+  type: list
+  sample: >
+    The configuration returned will always be in the same format
+     of the parameters above.
+commands:
+  description: The set of commands pushed to the remote device.
+  returned: always
+  type: list
+  sample: ['lacp priority 10']
+"""

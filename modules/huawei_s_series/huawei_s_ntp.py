@@ -60,7 +60,7 @@ EXAMPLES = '''
 # Set NTP authentication
 - huawei_s_ntp:
     key_id: 10
-    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#"
+    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#" #Use escape character
     auth: true
     state: present
 
@@ -70,7 +70,7 @@ EXAMPLES = '''
     source_int: Vlanif1
     acl: 2000
     key_id: 10
-    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#"
+    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#" #Use escape character
     auth: true
     state: present
 '''

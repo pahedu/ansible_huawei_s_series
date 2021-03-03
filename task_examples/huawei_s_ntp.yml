@@ -1,0 +1,76 @@
+DOCUMENTATION = '''
+---
+module: huawei_s_ntp
+extends_documentation_fragment: huawei_s
+version_added: "2.9"
+short_description: Manages core NTP configuration.
+description:
+    - Manages core NTP configuration.
+author:
+    - Aleksandr Natov (@pahedu)
+options:
+    server:
+        description:
+            - Network address of NTP server.
+    source_int:
+        description:
+            - Source interface for NTP packets.
+    acl:
+        description:
+            - ACL for peer/server access restricition.
+    auth:
+        description:
+            - Enable NTP authentication. Data type boolean.
+        type: bool
+        default: False
+    auth_key:
+        description:
+            - hmac-sha256 NTP authentication key. Used with ciper argument, respectively
+              use with huawei encoded string with special character escaping
+    key_id:
+        description:
+            - auth_key id. Data type string
+    state:
+        description:
+            - Manage the state of the resource.
+        default: present
+        choices: ['present', 'absent']
+'''
+
+EXAMPLES = '''
+# Set new NTP server and source interface
+- huawei_s_ntp:
+    server: 10.0.255.10
+    source_int: Vlanif1
+    state: present
+
+# Remove NTP ACL
+- huawei_s_ntp:
+    acl: 2000
+    state: absent
+
+# Set NTP authentication
+- huawei_s_ntp:
+    key_id: 10
+    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#" #Use escape character
+    auth: true
+    state: present
+
+# Set new NTP configuration
+- huawei_s_ntp:
+    server: 10.0.255.10
+    source_int: Vlanif1
+    acl: 2000
+    key_id: 10
+    auth_key: "%^%#LbK;Ln=*S>Na,B3Rr{FFn>:dBzjjGM&QH'V&@|;~09<{G`&4m(Ce=TTM\\Gn*%^%#" #Use escape character
+    auth: true
+    state: present
+'''
+
+RETURN = '''
+commands:
+    description: command sent to the device
+    returned: always
+    type: list
+    sample: ["undo ntp-service unicast-server 10.0.255.10", "undo ntp-service source-interface Loopback0"]
+'''

@@ -1,0 +1,377 @@
+DOCUMENTATION = """
+---
+module: huawei_s_lag_interfaces
+version_added: 2.9
+short_description: Manage Link Aggregation on Huawei S Series devices.
+description: This module manages properties of Link Aggregation Group on Huawei S Series devices.
+author: Aleksandr Natov (@pahedu)
+notes:
+  - Tested against VRP V200R010C00SPC600
+  - This module works with connection C(network_cli).
+options:
+  config:
+    description: A list of link aggregation group configurations.
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+        - ID of Ethernet Channel of interfaces.
+        - Refer to vendor documentation for valid port values.
+        type: str
+        required: True
+      members:
+        description:
+        - Interface options for the link aggregation group.
+        type: list
+        suboptions:
+          member:
+            description:
+            - Interface member of the link aggregation group.
+            type: str
+          mode:
+            description:
+            - Etherchannel Mode of the interface for link aggregation.
+            type: str
+            choices:
+            - 'on'
+            - 'active'
+            - 'passive'
+  state:
+    description:
+    - The state of the configuration after module completion
+    type: str
+    choices:
+    - merged
+    - replaced
+    - overridden
+    - deleted
+    default: merged
+"""
+
+EXAMPLES = """
+---
+# Using merged
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#GigabitEthernet0/0/20         Down        1
+#GigabitEthernet0/0/21         Down        1
+
+- name: Merge provided configuration with device configuration
+  huawei_s_lag_interfaces:
+    config:
+      - name: Eth-Trunk2
+        members:
+        - member: GigabitEthernet0/0/20
+          mode: active
+        - member: GigabitEthernet0/0/21
+          mode: active
+      - name: Eth-Trunk3
+        members:
+        - member: GigabitEthernet0/0/30
+          mode: on
+    state: merged
+
+# After state:
+# ------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/20  Unselect 1GE      32768   3      561     10100010  1
+#GigabitEthernet0/0/21  Unselect 1GE      32768   4      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/20  0        0000-0000-0000  0       0      0       10100011
+#GigabitEthernet0/0/21  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#GigabitEthernet0/0/30         Down        1
+
+# Using overridden
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/20  Unselect 1GE      32768   3      561     10100010  1
+#GigabitEthernet0/0/21  Unselect 1GE      32768   4      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/20  0        0000-0000-0000  0       0      0       10100011
+#GigabitEthernet0/0/21  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#GigabitEthernet0/0/30         Down        1
+
+- name: Override device configuration of all interfaces with provided configuration
+  huawei_s_lag_interfaces:
+    config:
+      - name: Eth-Trunk2
+        members:
+        - member: GigabitEthernet0/0/20
+          mode: active
+        - member: GigabitEthernet0/0/21
+          mode: active
+    state: overridden
+
+# After state:
+# ------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/20  Unselect 1GE      32768   1      561     10100010  1
+#GigabitEthernet0/0/21  Unselect 1GE      32768   2      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/20  0        0000-0000-0000  0       0      0       10100011
+#GigabitEthernet0/0/21  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+
+
+# Using replaced
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/20  Unselect 1GE      32768   1      561     10100010  1
+#GigabitEthernet0/0/21  Unselect 1GE      32768   2      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/20  0        0000-0000-0000  0       0      0       10100011
+#GigabitEthernet0/0/21  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+
+- name: Replaces device configuration of listed interfaces with provided configuration
+  huawei_s_lag_interfaces:
+    config:
+      - name: Eth-Trunk2
+        members:
+        - member: GigabitEthernet0/0/23
+          mode: active
+      - name: Eth-Trunk3
+        members:
+        - member: GigabitEthernet0/0/30
+          mode: on
+    state: replaced
+
+# After state:
+# ------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/23  Unselect 1GE      32768   1      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/23  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#GigabitEthernet0/0/30         Down        1
+
+
+# Using Deleted
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#Local:
+#LAG ID: 2                   WorkingMode: LACP
+#Preempt Delay: Disabled     Hash arithmetic: According to SIP-XOR-DIP
+#System Priority: 32768      System ID: a08c-f8f6-7900
+#Least Active-linknumber: 1  Max Active-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#ActorPortName          Status   PortType PortPri PortNo PortKey PortState Weight
+#GigabitEthernet0/0/23  Unselect 1GE      32768   1      561     10100010  1
+#
+#Partner:
+#--------------------------------------------------------------------------------
+#ActorPortName          SysPri   SystemID        PortPri PortNo PortKey PortState
+#GigabitEthernet0/0/23  0        0000-0000-0000  0       0      0       10100011
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#GigabitEthernet0/0/30         Down        1
+
+- name: "Delete LAG attributes of given interfaces (Note: This won't delete the interface itself)"
+  huawei_s_lag_interfaces:
+    config:
+      - name: Eth-Trunk2
+      - name: Eth-Trunk3
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+
+
+# Using Deleted without any config passed
+#"(NOTE: This will delete all of configured Eth-Trunk configuration)"
+
+#
+# Before state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+
+- name: "Delete all configured LAG attributes for interfaces (Note: This won't delete the interface itself)"
+  huawei_s_lag_interfaces:
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display eth-trunk
+#Eth-Trunk2's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+#
+#Eth-Trunk3's state information is:
+#WorkingMode: NORMAL         Hash arithmetic: According to SIP-XOR-DIP
+#Least Active-linknumber: 1  Max Bandwidth-affected-linknumber: 8
+#Operate status: down        Number Of Up Port In Trunk: 0
+#--------------------------------------------------------------------------------
+#PortName                      Status      Weight
+"""
+
+RETURN = """
+before:
+  description: The configuration as structured data prior to module invocation.
+  returned: always
+  type: list
+  sample: The configuration returned will always be in the same format of the parameters above.
+after:
+  description: The configuration as structured data after module completion.
+  returned: when changed
+  type: list
+  sample: The configuration returned will always be in the same format of the parameters above.
+commands:
+  description: The set of commands pushed to the remote device
+  returned: always
+  type: list
+  sample: ['interface Eth-Trunk1', 'mode lacp', 'trunkport GigabitEthernet0/0/20']
+"""
