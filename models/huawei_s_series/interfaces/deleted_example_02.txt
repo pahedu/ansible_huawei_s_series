@@ -1,0 +1,44 @@
+# Using Deleted without any config passed
+#"(NOTE: This will delete all of configured resource module attributes from each configured interface)"
+
+# Before state:
+# -------------
+#
+#[HUAWEI]display interface
+##
+#GigabitEthernet0/0/2 current state : DOWN
+#Description:
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 9216
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+##
+#GigabitEthernet0/0/3 current state : Administratively DOWN
+#Description:Configured and Overridden by Ansible Network
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 2000
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+
+- name: "Delete module attributes of all interfaces (Note: This won't delete the interface itself)"
+  huawei_s_interfaces:
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display  interface
+##
+#GigabitEthernet0/0/2 current state : DOWN
+#Description:
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 9216
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+##
+#GigabitEthernet0/0/3 current state : DOWN
+#Description:
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 9216
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE

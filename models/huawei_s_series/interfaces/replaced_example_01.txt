@@ -1,0 +1,52 @@
+# Using replaced
+
+# Before state:
+# -------------
+#
+#[HUAWEI]display interface
+##
+#GigabitEthernet0/0/2 current state : DOWN
+#Description:Configured and Merged by Ansible Network
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 9216
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+##
+#GigabitEthernet0/0/3 current state : Administratively DOWN
+#Description:Configured and Merged by Ansible Network
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 2800
+#Speed : 100,    Loopback: NONE
+#Duplex: HALF,   Negotiation: DISABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+
+- name: Replaces device configuration of listed interfaces with provided configuration
+  huawei_s_interfaces:
+    config:
+      - name: GigabitEthernet0/0/3
+        description: 'Configured and Replaced by Ansible Network'
+        enabled: False
+        duplex: full
+        mtu: 2500
+        speed: 1000
+        negotiation: True
+    state: replaced
+
+# After state:
+# -------------
+#
+#[HUAWEI]display interface
+##
+#GigabitEthernet0/0/2 current state : DOWN
+#Description:Configured and Merged by Ansible Network
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 9216
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE
+##
+#GigabitEthernet0/0/3 current state : Administratively DOWN
+#Line protocol current state : DOWN
+#Description:Configured and Replaced by Ansible Network
+#PVID :    1, TPID : 8100(Hex), The Maximum Frame Length is 2500
+#Speed : 1000,   Loopback: NONE
+#Duplex: FULL,   Negotiation: ENABLE
+#Mdi   : AUTO,   Flow-control: DISABLE

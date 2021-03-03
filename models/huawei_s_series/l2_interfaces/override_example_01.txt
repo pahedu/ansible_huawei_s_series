@@ -1,0 +1,25 @@
+# Using overridden
+
+# Before state:
+# -------------
+#
+#[HUAWEI]display port vlan
+#GigabitEthernet0/0/2        trunk        20    20-25 40
+#GigabitEthernet0/0/3        access       10    -
+#GigabitEthernet0/0/4        hybrid       30    10-20 30 40-50 65
+
+- name: Override device configuration of all l2 interfaces with provided configuration
+  huawei_s_l2_interfaces:
+    config:
+      - name: GigabitEthernet0/0/2
+        access:
+          vlan: 20
+    state: overridden
+
+# After state:
+# -------------
+#
+#[HUAWEI]display port vlan
+#GigabitEthernet0/0/2        access       20    -
+#GigabitEthernet0/0/3        auto         1     1-4094
+#GigabitEthernet0/0/4        auto         1     1-4094

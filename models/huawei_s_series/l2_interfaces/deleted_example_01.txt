@@ -1,0 +1,23 @@
+# Using Deleted
+
+# Before state:
+# -------------
+#
+#[HUAWEI]display port vlan
+#GigabitEthernet0/0/2        access       20    -
+#GigabitEthernet0/0/3        auto         1     1-4094
+#GigabitEthernet0/0/4        auto         1     1-4094
+
+- name: Delete L2 interfaces as in given arguments
+  huawei_s_l2_interfaces:
+    config:
+      - name: GigabitEthernet0/0/2
+    state: deleted
+
+# After state:
+# -------------
+#
+#[HUAWEI]display port vlan
+#GigabitEthernet0/0/2        auto         1     1-4094
+#GigabitEthernet0/0/3        auto         1     1-4094
+#GigabitEthernet0/0/4        auto         1     1-4094

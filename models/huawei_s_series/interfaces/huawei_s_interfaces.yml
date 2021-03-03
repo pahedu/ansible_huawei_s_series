@@ -1,0 +1,76 @@
+---
+GENERATOR_VERSION: '1.0'
+
+ANSIBLE_METADATA: |
+    {
+      'metadata_version': '1.0',
+      'status': ['preview'],
+      'supported_by': 'community'
+    }
+
+NETWORK_OS: huawei_s
+RESOURCE: interfaces
+COPYRIGHT: Copyright 2019 Red Hat
+
+
+DOCUMENTATION: |
+  module: huawei_s_interfaces
+  version_added: 2.9
+  short_description: Manages interface attributes of Huawei S Series network devices
+  description: This module manages the interface attributes of Huawei S Series network devices.
+  author: Aleksandr Natov (@pahedu)
+  options:
+    config:
+      description: A dictionary of interface options
+      type: list
+      suboptions:
+        name:
+          description:
+          - Full name of interface, e.g. GigabitEthernet0/0/2, LoopBack999.
+          type: str
+          required: True
+        description:
+          description:
+          - Interface description.
+          type: str
+        enabled:
+          description:
+          - Administrative state of the interface.
+          - Set the value to C(true) to administratively enable the interface or C(false) to disable it.
+          type: bool
+          default: True
+        speed:
+          description:
+          - Interface link speed. Applicable for GigabitEthernet interfaces only.
+          type: str
+        mtu:
+          description:
+          - MTU for a specific interface.
+          - Refer to vendor documentation for valid values.
+          type: int
+        duplex:
+          description:
+          - Interface link status. Applicable for GigabitEthernet interfaces only, either in half duplex,
+            full duplex or in automatic state which negotiates the duplex automatically.
+          type: str
+          choices: ['full', 'half']
+        negotiation:
+          description:
+          - Interface speed and duplex negotiation.
+          type: bool
+    state:
+      choices:
+      - merged
+      - replaced
+      - overridden
+      - deleted
+      default: merged
+      description:
+      - The state of the configuration after module completion
+      type: str
+
+EXAMPLES:
+  - deleted_example_01.txt
+  - merged_example_01.txt
+  - override_example_01.txt
+  - replaced_example_01.txt
